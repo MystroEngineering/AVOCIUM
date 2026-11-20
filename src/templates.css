@@ -1,0 +1,11 @@
+.template-workspace { max-width: 1450px; }
+.template-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-block: 12px; }
+.template-tabs button[aria-pressed=true] { background: #243c58; color: white; }
+.template-filters { padding-inline: 0; }
+.template-card { padding: 18px; margin-block: 12px; }
+.template-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: start; gap: 8px; }
+.template-header h2, .template-header p { margin: 0 0 4px; }
+.template-workspace pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; background: #f4f7fb; border-radius: 10px; padding: 13px; }
+.template-card pre { max-height: 160px; overflow: auto; }
+.template-workspace .template-body { min-height: 180px; }
+@media print { .template-workspace .office-preview .form-grid, .template-workspace .office-preview .template-tabs { display: none; } }

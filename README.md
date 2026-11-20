@@ -4,6 +4,9 @@ Prototype de logiciel de gestion juridique pour un cabinet au Maroc.
 
 ## Fonctionnalités disponibles
 
+- Frais liés aux dossiers, avec totaux filtrés, vues tableau/cartes, impression, export CSV et préparation d’un courriel.
+- Modèles de contrats, d’honoraires et de correspondance en arabe, français ou anglais, avec variables issues du dossier, aperçu, export texte et impression.
+
 - Interface en arabe, contenu de droite à gauche et menu à gauche. L’accueil ouvre le tableau de bord analytique.
 - Périodes, graphiques, alertes, export CSV compatible Excel et impression PDF via le navigateur. Les montants encaissés sont regroupés selon la date de la facture correspondante.
 - Dossiers avec vue cartes ou tableau, recherche, compteurs et filtre des archives.
