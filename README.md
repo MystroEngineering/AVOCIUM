@@ -4,6 +4,8 @@ Prototype de logiciel de gestion juridique pour un cabinet au Maroc.
 
 ## Fonctionnalités disponibles
 
+- Écran Dossiers en arabe avec navigation de droite à gauche, vue cartes ou tableau, recherche, compteurs et filtre des archives.
+
 - Tableau de bord des dossiers, audiences, clients et honoraires
 - Création, modification et suppression des dossiers judiciaires
 - Fichier clients (personnes physiques et morales)
