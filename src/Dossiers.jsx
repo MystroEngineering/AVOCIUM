@@ -21,14 +21,15 @@ const categories = [
 ];
 const formatDate = date => date ? date.split('-').reverse().join('/') : '—';
 
-export default function Dossiers({ data, onOpen, onCreate, onExport }) {
-  const [filter, setFilter] = useState('all');
+export default function Dossiers({ data, onOpen, onCreate, onExport, selectedIds }) {
+  const [filter, setFilter] = useState(selectedIds ? 'no-hearing' : 'all');
   const [query, setQuery] = useState('');
   const [view, setView] = useState('cards');
   const totals = { all: data.dossiers.length, active: 0, pending: 0, closed: 0, archived: 0 };
   for (const dossier of data.dossiers) totals[group(dossier.statut)]++;
+  const available = selectedIds ? [...categories, ['no-hearing', 'دون جلسة قادمة']] : categories;
   const term = query.trim().toLocaleLowerCase();
-  const rows = data.dossiers.filter(dossier => (filter === 'all' || group(dossier.statut) === filter)
+  const rows = data.dossiers.filter(dossier => (filter === 'all' || group(dossier.statut) === filter || (filter === 'no-hearing' && selectedIds?.includes(dossier.id)))
     && [...Object.values(dossier), labels[dossier.type], labels[dossier.statut]]
       .some(value => String(value ?? '').toLocaleLowerCase().includes(term)));
   const open = dossier => <button className="case-open" onClick={() => onOpen(dossier)}><FolderOpen size={16}/> فتح الملف</button>;
@@ -50,7 +51,7 @@ export default function Dossiers({ data, onOpen, onCreate, onExport }) {
       <label className="case-search"><Search size={18}/><input type="search" aria-label="بحث في الملفات"
         placeholder="ابحث بالمرجع أو اسم الموكل أو المحكمة" value={query} onChange={event => setQuery(event.target.value)}/></label>
       <div className="case-filters" role="group" aria-label="حالة الملف">
-        {categories.map(([id, label]) => <button key={id} aria-pressed={filter === id} onClick={() => setFilter(id)}>
+        {available.map(([id, label]) => <button key={id} aria-pressed={filter === id} onClick={() => setFilter(id)}>
           {id === 'archived' && <Archive size={15}/>}
           {id === 'all' ? 'الكل' : label}{id === 'archived' && ` (${totals[id]})`}
         </button>)}

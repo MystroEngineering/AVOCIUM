@@ -1,53 +1,217 @@
 import Dossiers, { labels as caseLabels } from './Dossiers.jsx';
-import React,{useEffect,useMemo,useState} from 'react';
-import {Scale,LayoutDashboard,FolderOpen,Users,CalendarDays,Files,Receipt,Settings,Search,Plus,Bell,ChevronDown,ChevronRight,Filter,MoreHorizontal,ArrowUpRight,Clock3,CheckCircle2,AlertTriangle,Wallet,Menu,X,Trash2,Pencil,Save,Download,BriefcaseBusiness,Landmark,FileText,Eye} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import Analytics from './Analytics.jsx';
+import { downloadCsv, money } from './locale.js';
+import { Scale, LayoutDashboard, FolderOpen, Users, CalendarDays, Files, Receipt, Settings, Search, Plus, Menu, X, Trash2, Pencil, Save, Download } from 'lucide-react';
 
 const initial={
-  clients:[{id:'CLI-001',nom:'Société Atlas SARL',type:'Personne morale',telephone:'0522 45 67 89',email:'contact@atlas.example',ville:'Casablanca'},{id:'CLI-002',nom:'Ahmed El Mansouri',type:'Personne physique',telephone:'0612 34 56 78',email:'ahmed@example.com',ville:'Meknès'},{id:'CLI-003',nom:'Fatima Benali',type:'Personne physique',telephone:'0661 22 33 44',email:'fatima@example.com',ville:'Rabat'},{id:'CLI-004',nom:'Entreprise Al Amal',type:'Personne morale',telephone:'0537 88 55 22',email:'admin@alamal.example',ville:'Fès'}],
-  dossiers:[{id:'DOS-2026-001',objet:'Litige commercial – recouvrement',client:'Société Atlas SARL',type:'Commercial',tribunal:'Tribunal de commerce de Casablanca',responsable:'Me Karim Alaoui',statut:'En cours',ouverture:'2026-09-12',prochaine:'2026-11-24',reference:'2026/8201/1542'},{id:'DOS-2026-002',objet:'Contentieux immobilier',client:'Ahmed El Mansouri',type:'Civil',tribunal:'Tribunal de première instance de Meknès',responsable:'Me Salma Idrissi',statut:'Audience prévue',ouverture:'2026-08-06',prochaine:'2026-11-26',reference:'2026/1101/329'},{id:'DOS-2026-003',objet:'Divorce et pension alimentaire',client:'Fatima Benali',type:'Famille',tribunal:'Tribunal de la famille de Rabat',responsable:'Me Karim Alaoui',statut:'En cours',ouverture:'2026-10-01',prochaine:'2026-12-02',reference:'2026/1502/581'},{id:'DOS-2026-004',objet:'Rupture de contrat de travail',client:'Entreprise Al Amal',type:'Social',tribunal:'Tribunal de première instance de Fès',responsable:'Me Salma Idrissi',statut:'Clôturé',ouverture:'2026-05-20',prochaine:'',reference:'2026/1301/218'}],
-  audiences:[{id:'AUD-001',date:'2026-11-24',heure:'09:30',dossier:'DOS-2026-001',objet:'Audience de mise en état',tribunal:'Tribunal de commerce de Casablanca',statut:'Programmée'},{id:'AUD-002',date:'2026-11-26',heure:'11:00',dossier:'DOS-2026-002',objet:'Audience de plaidoirie',tribunal:'TPI Meknès',statut:'Programmée'},{id:'AUD-003',date:'2026-12-02',heure:'10:00',dossier:'DOS-2026-003',objet:'Audience de conciliation',tribunal:'Tribunal de la famille de Rabat',statut:'Programmée'}],
-  documents:[{id:'DOC-001',nom:'Assignation en paiement.pdf',dossier:'DOS-2026-001',categorie:'Acte juridique',date:'2026-10-10'},{id:'DOC-002',nom:'Contrat de vente.pdf',dossier:'DOS-2026-002',categorie:'Pièce justificative',date:'2026-09-18'},{id:'DOC-003',nom:'Conclusions défense.pdf',dossier:'DOS-2026-003',categorie:'Conclusions',date:'2026-11-06'}],
-  factures:[{id:'FAC-2026-001',client:'Société Atlas SARL',dossier:'DOS-2026-001',montant:8500,paye:5000,date:'2026-10-15'},{id:'FAC-2026-002',client:'Ahmed El Mansouri',dossier:'DOS-2026-002',montant:6000,paye:6000,date:'2026-10-22'},{id:'FAC-2026-003',client:'Fatima Benali',dossier:'DOS-2026-003',montant:4500,paye:1000,date:'2026-11-05'}]
+  clients:[{id:'CLI-001',nom:'شركة الأطلس',type:'Personne morale',telephone:'0522 45 67 89',email:'contact@atlas.example',ville:'الدار البيضاء',dateCreation:'2026-09-01'},{id:'CLI-002',nom:'أحمد المنصوري',type:'Personne physique',telephone:'0612 34 56 78',email:'ahmed@example.com',ville:'مكناس',dateCreation:'2026-08-01'},{id:'CLI-003',nom:'فاطمة بنعلي',type:'Personne physique',telephone:'0661 22 33 44',email:'fatima@example.com',ville:'الرباط',dateCreation:'2026-10-01'},{id:'CLI-004',nom:'شركة الأمل',type:'Personne morale',telephone:'0537 88 55 22',email:'admin@alamal.example',ville:'فاس',dateCreation:'2026-05-20'}],
+  dossiers:[{id:'DOS-2026-001',objet:'نزاع تجاري – تحصيل مستحقات',client:'شركة الأطلس',type:'Commercial',tribunal:'المحكمة التجارية بالدار البيضاء',responsable:'الأستاذ كريم العلوي',statut:'En cours',ouverture:'2026-09-12',prochaine:'2026-11-24',reference:'2026/8201/1542'},{id:'DOS-2026-002',objet:'نزاع عقاري',client:'أحمد المنصوري',type:'Civil',tribunal:'المحكمة الابتدائية بمكناس',responsable:'الأستاذة سلمى الإدريسي',statut:'Audience prévue',ouverture:'2026-08-06',prochaine:'2026-11-26',reference:'2026/1101/329'},{id:'DOS-2026-003',objet:'طلاق ونفقة',client:'فاطمة بنعلي',type:'Famille',tribunal:'محكمة الأسرة بالرباط',responsable:'الأستاذ كريم العلوي',statut:'En cours',ouverture:'2026-10-01',prochaine:'2026-12-02',reference:'2026/1502/581'},{id:'DOS-2026-004',objet:'إنهاء عقد العمل',client:'شركة الأمل',type:'Social',tribunal:'المحكمة الابتدائية بفاس',responsable:'الأستاذة سلمى الإدريسي',statut:'Clôturé',ouverture:'2026-05-20',prochaine:'',reference:'2026/1301/218'}],
+  audiences:[{id:'AUD-001',date:'2026-11-24',heure:'09:30',dossier:'DOS-2026-001',objet:'جلسة إعداد القضية',tribunal:'المحكمة التجارية بالدار البيضاء',statut:'Programmée'},{id:'AUD-002',date:'2026-11-26',heure:'11:00',dossier:'DOS-2026-002',objet:'جلسة المرافعة',tribunal:'المحكمة الابتدائية بمكناس',statut:'Programmée'},{id:'AUD-003',date:'2026-12-02',heure:'10:00',dossier:'DOS-2026-003',objet:'جلسة الصلح',tribunal:'محكمة الأسرة بالرباط',statut:'Programmée'}],
+  documents:[{id:'DOC-001',nom:'دعوى أداء.pdf',dossier:'DOS-2026-001',categorie:'Acte juridique',date:'2026-10-10'},{id:'DOC-002',nom:'عقد بيع.pdf',dossier:'DOS-2026-002',categorie:'Pièce justificative',date:'2026-09-18'},{id:'DOC-003',nom:'مذكرة الدفاع.pdf',dossier:'DOS-2026-003',categorie:'Conclusions',date:'2026-11-06'}],
+  factures:[{id:'FAC-2026-001',client:'شركة الأطلس',dossier:'DOS-2026-001',montant:8500,paye:5000,date:'2026-10-15',echeance:'2026-11-01'},{id:'FAC-2026-002',client:'أحمد المنصوري',dossier:'DOS-2026-002',montant:6000,paye:6000,date:'2026-10-22'},{id:'FAC-2026-003',client:'فاطمة بنعلي',dossier:'DOS-2026-003',montant:4500,paye:1000,date:'2026-11-05',echeance:'2026-12-05'}]
 };
 const nav=[['dashboard','Tableau de bord',LayoutDashboard],['dossiers','Dossiers judiciaires',FolderOpen],['clients','Clients & mandants',Users],['audiences','Audiences',CalendarDays],['documents','Documents',Files],['factures','Honoraires & factures',Receipt],['settings','Paramètres',Settings]];
-const arabicNav = { dashboard: 'لوحة التحكم', dossiers: 'الملفات', clients: 'الموكلون', audiences: 'الجلسات', documents: 'الوثائق', factures: 'الفواتير', settings: 'الإعدادات' };
-const arabicFields = { objet: 'موضوع الملف', description: 'وصف الملف', client: 'الموكل', type: 'نوع القضية', tribunal: 'المحكمة', responsable: 'المحامي المسؤول', reference: 'مرجع المحكمة', statut: 'الحالة', ouverture: 'تاريخ فتح الملف', prochaine: 'الجلسة المقبلة' };
-const fields={dossiers:[['objet','Intitulé du dossier'],['description','Description','textarea'],['client','Client','client'],['type','Type de dossier','select',['Civil','Pénal','Commercial','Social','Famille','Administratif','Autre']],['tribunal','Juridiction'],['responsable','Avocat responsable'],['reference','Référence tribunal'],['statut','Statut','select',['En cours','Audience prévue','En attente','Clôturé','Archivé']],['ouverture','Date d’ouverture','date'],['prochaine','Prochaine audience','date']],clients:[['nom','Nom / raison sociale'],['type','Type','select',['Personne physique','Personne morale']],['telephone','Téléphone'],['email','Adresse e-mail','email'],['ville','Ville']],audiences:[['dossier','Dossier','dossier'],['date','Date','date'],['heure','Heure','time'],['objet','Objet de l’audience'],['tribunal','Juridiction'],['statut','Statut','select',['Programmée','Reportée','Tenue','Annulée']]],documents:[['nom','Nom du document'],['dossier','Dossier','dossier'],['categorie','Catégorie','select',['Acte juridique','Pièce justificative','Conclusions','Correspondance','Autre']],['date','Date','date']],factures:[['client','Client','client'],['dossier','Dossier','dossier'],['montant','Montant (MAD)','number'],['paye','Montant réglé (MAD)','number'],['date','Date de facturation','date']]};
+const fields={dossiers:[['objet','Intitulé du dossier'],['description','Description','textarea'],['client','Client','client'],['type','Type de dossier','select',['Civil','Pénal','Commercial','Social','Famille','Administratif','Autre']],['tribunal','Juridiction'],['responsable','Avocat responsable'],['reference','Référence tribunal'],['statut','Statut','select',['En cours','Audience prévue','En attente','Clôturé','Archivé']],['ouverture','Date d’ouverture','date'],['prochaine','Prochaine audience','date']],clients:[['nom','Nom / raison sociale'],['type','Type','select',['Personne physique','Personne morale']],['telephone','Téléphone'],['email','Adresse e-mail','email'],['ville','Ville']],audiences:[['dossier','Dossier','dossier'],['date','Date','date'],['heure','Heure','time'],['objet','Objet de l’audience'],['tribunal','Juridiction'],['statut','Statut','select',['Programmée','Reportée','Tenue','Annulée']]],documents:[['nom','Nom du document'],['dossier','Dossier','dossier'],['categorie','Catégorie','select',['Acte juridique','Pièce justificative','Conclusions','Correspondance','Autre']],['date','Date','date']],factures:[['client','Client','client'],['dossier','Dossier','dossier'],['montant','Montant (MAD)','number'],['paye','Montant réglé (MAD)','number'],['date','Date de facturation','date'],['echeance','Date d’échéance','date']]};
 const columns={dossiers:[['id','Référence'],['objet','Objet'],['client','Client'],['type','Nature'],['statut','Statut'],['prochaine','Prochaine audience']],clients:[['id','Référence'],['nom','Client'],['type','Type'],['telephone','Téléphone'],['ville','Ville']],audiences:[['date','Date'],['heure','Heure'],['dossier','Dossier'],['objet','Objet'],['statut','Statut']],documents:[['nom','Document'],['dossier','Dossier'],['categorie','Catégorie'],['date','Date']],factures:[['id','Facture'],['client','Client'],['montant','Montant'],['paye','Réglé'],['reste','Solde']]};
-const titles={dashboard:'Vue d’ensemble',dossiers:'Dossiers judiciaires',clients:'Clients & mandants',audiences:'Agenda des audiences',documents:'Documents juridiques',factures:'Honoraires & factures',settings:'Paramètres du cabinet'};
-const fmtDate=(d)=>d?new Date(`${d}T12:00:00`).toLocaleDateString('fr-MA',{day:'2-digit',month:'short',year:'numeric'}):'—';
-const fmtMoney=(n)=>`${Number(n||0).toLocaleString('fr-MA')} MAD`;
-const badge=(v)=>['Clôturé','Tenue'].includes(v)?'green':['Audience prévue','Programmée'].includes(v)?'blue':['En attente','Reportée'].includes(v)?'amber':'neutral';
-function load(){try{const p=JSON.parse(localStorage.getItem('avocium-demo-v1') ?? localStorage.getItem('lexcabinet-demo-v1'));if(p&&Object.keys(initial).every(k=>Array.isArray(p[k])))return p;}catch{}return initial;}
-export default function App(){
- const [data,setData]=useState(load),[page,setPage]=useState(window.location.pathname === '/' || window.location.pathname === '/dossiers' ? 'dossiers' : 'dashboard'),[query,setQuery]=useState(''),[modal,setModal]=useState(null),[editing,setEditing]=useState(null),[form,setForm]=useState({}),[filter,setFilter]=useState('Tous'),[mobile,setMobile]=useState(false),[toast,setToast]=useState('');
- useEffect(()=>localStorage.setItem('avocium-demo-v1',JSON.stringify(data)),[data]);
- const notify=(msg)=>{setToast(msg);setTimeout(()=>setToast(''),3500)};
- const start=(section,row=null)=>{setModal(section);setEditing(row?.id||null);setForm(row?{...row}:{statut:section==='dossiers'?'En cours':section==='audiences'?'Programmée':undefined,date:new Date().toISOString().slice(0,10),ouverture:new Date().toISOString().slice(0,10),paye:0});};
- const save=(e)=>{e.preventDefault();const required=fields[modal].filter(x=>!['description','ouverture','prochaine','reference','responsable','telephone','email','ville','heure','tribunal','categorie','paye'].includes(x[0]));if(required.some(x=>!String(form[x[0]]??'').trim()))return notify(caseModal ? 'يرجى ملء الحقول المطلوبة.' : 'Veuillez remplir les champs obligatoires.');const prefixes={dossiers:'DOS-2026',clients:'CLI',audiences:'AUD',documents:'DOC',factures:'FAC-2026'};const id=editing||`${prefixes[modal]}-${String(Date.now()).slice(-6)}`;setData(prev=>({...prev,[modal]:editing?prev[modal].map(x=>x.id===editing?{...form,id}:x):[{...form,id},...prev[modal]]}));setModal(null);notify(caseModal ? 'تم حفظ الملف' : editing ? 'Élément modifié avec succès' : 'Nouvel élément enregistré');};
- const remove=(s,id)=>{
-  if (s === 'dossiers' && ['audiences','documents','factures'].some(key=>data[key].some(item=>item.dossier===id))) {
-   notify('لا يمكن حذف ملف مرتبط بجلسات أو وثائق أو فواتير. يمكنك أرشفته.');
-   return;
-  }
-  if(!confirm(caseModal ? 'هل تريد حذف هذا الملف نهائياً؟' : 'Supprimer cet élément ? Cette opération est irréversible.'))return;
-  setData(p=>({...p,[s]:p[s].filter(x=>x.id!==id)}));
-  if(caseModal)setModal(null);
-  notify(caseModal ? 'تم حذف الملف' : 'Élément supprimé');
- };
- const exportCSV=(s)=>{let list=data[s];const cols=columns[s].map(c=>c[0]);const escape=v=>'"'+String(v??'').replaceAll('"','""')+'"';const csv='\uFEFF'+[cols.join(';'),...list.map(r=>cols.map(k=>escape(k==='reste'?Number(r.montant||0)-Number(r.paye||0):r[k])).join(';'))].join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`avocium-${s}.csv`;a.click();URL.revokeObjectURL(url);};
- const shown=useMemo(()=>page in columns?data[page].filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(query.toLowerCase()))&&(filter==='Tous'||r.statut===filter)):[],[data,page,query,filter]);
- const pending=data.factures.reduce((s,f)=>s+Number(f.montant||0)-Number(f.paye||0),0);
- const rtl=page==='dossiers';
- const caseModal=modal==='dossiers' && rtl;
- const navigate=p=>{setPage(p);setQuery('');setFilter('Tous');setMobile(false)};
- return <div className={`shell ${rtl ? "cases-rtl" : ""}`} dir={rtl ? "rtl" : "ltr"} lang={rtl ? "ar" : "fr"}>
- <aside className={`sidebar ${mobile?'open':''}`}><div className="brand"><div className="brand-icon"><Scale size={26}/></div><div><strong>AVOCIUM</strong><small>{rtl ? "إدارة المكتب القانوني" : "GESTION JURIDIQUE"}</small></div><button className="mobile-close" onClick={()=>setMobile(false)}><X size={18}/></button></div><div className="workspace"><div className="workspace-logo">AV</div><div className="workspace-text"><strong>{rtl ? "مكتب المحاماة" : "Cabinet Juridique"}</strong><span>{rtl ? "فضاء العمل" : "Espace professionnel"}</span></div><ChevronDown size={16}/></div><nav>{nav.map(([id,name,Icon],i)=><button key={id} className={`nav-item ${page===id?'active':''} ${i===6?'last':''}`} onClick={()=>navigate(id)}><Icon size={19} strokeWidth={1.9}/><span>{rtl ? arabicNav[id] : name}</span>{page===id&&<span className="nav-dot"/>}</button>)}</nav><div className="side-bottom">{!rtl && <div className="support"><span className="support-icon"><Landmark size={20}/></span><strong>Votre cabinet, organisé.</strong><small>Centralisez vos activités juridiques dans un seul espace.</small></div>}<div className="profile"><div className="avatar">MA</div><div><b>{rtl ? "إدارة المكتب" : "Me Administrateur"}</b><small>{rtl ? "حساب تجريبي" : "Compte de démonstration"}</small></div><MoreHorizontal size={18}/></div></div></aside>
- <main className="main"><header className="topbar"><button className="hamburger" onClick={()=>setMobile(true)}><Menu size={22}/></button><div className="breadcrumb">{rtl ? <strong>الملفات</strong> : <>Cabinet <ChevronRight size={14}/> <strong>{titles[page]}</strong></>}</div><div className="top-actions"><span className="demo-label">{rtl ? "وضع تجريبي" : "Mode démonstration"}</span><button aria-label="Notifications" className="icon-button" onClick={()=>notify(`${data.audiences.filter(a=>a.statut==='Programmée').length} audiences programmées`)}><Bell size={20}/><i/></button><span className="mini-avatar">MA</span></div></header>
- {rtl ? <Dossiers data={data} onCreate={()=>start("dossiers")} onOpen={row=>start("dossiers", row)} onExport={()=>exportCSV("dossiers")}/> : <div className="content"><div className="page-heading"><div><span className="eyebrow">ESPACE CABINET / {page==='dashboard'?'ACCUEIL':page.toUpperCase()}</span><h1>{titles[page]}</h1><p>{page==='dashboard'?'Suivez votre activité et vos échéances en toute simplicité.':page==='settings'?'Informations et préférences de votre espace de travail.':`Gérez ${titles[page].toLowerCase()} depuis une interface centralisée.`}</p></div>{page in columns&&<button className="primary" onClick={()=>start(page)}><Plus size={18}/> {page==='dossiers'?'Nouveau dossier':page==='clients'?'Nouveau client':page==='audiences'?'Nouvelle audience':page==='documents'?'Nouveau document':'Nouvelle facture'}</button>}</div>
- {page==='dashboard'?<><div className="stats"><Stat icon={FolderOpen} label="Dossiers actifs" value={data.dossiers.filter(d=>!['Clôturé', 'Archivé'].includes(d.statut)).length} detail="Dossiers en suivi" tone="indigo"/><Stat icon={CalendarDays} label="Audiences à venir" value={data.audiences.filter(a=>a.statut==='Programmée').length} detail="Rendez-vous programmés" tone="cyan"/><Stat icon={Users} label="Clients enregistrés" value={data.clients.length} detail="Mandants au cabinet" tone="violet"/><Stat icon={Wallet} label="Honoraires en attente" value={fmtMoney(pending)} detail="Reste à encaisser" tone="orange"/></div><div className="dashboard-grid"><section className="panel"><div className="panel-head"><div><h2>Derniers dossiers</h2><p>Vos affaires judiciaires récentes</p></div><button className="text-link" onClick={()=>navigate('dossiers')}>Voir tous <ArrowUpRight size={16}/></button></div><div className="table-wrap"><table><thead><tr><th>DOSSIER</th><th>CLIENT</th><th>STATUT</th></tr></thead><tbody>{data.dossiers.slice(0,5).map(d=><tr key={d.id} onClick={()=>{navigate('dossiers');start('dossiers',d)}} className="clickable"><td><b>{d.objet}</b><small>{d.id}</small></td><td>{d.client}</td><td><span className={`status ${badge(d.statut)}`}>{d.statut}</span></td></tr>)}</tbody></table></div></section><section className="panel agenda-panel"><div className="panel-head"><div><h2>Prochaines audiences</h2><p>Échéances judiciaires à suivre</p></div><button className="text-link" onClick={()=>navigate('audiences')}>Agenda <ArrowUpRight size={16}/></button></div><div className="agenda-list">{data.audiences.filter(a=>a.statut==='Programmée').sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4).map(a=><div className="agenda-row" key={a.id}><div className="date-square"><strong>{a.date?.slice(8,10)}</strong><small>{new Date(`${a.date}T12:00:00`).toLocaleDateString('fr-FR',{month:'short'})}</small></div><div className="agenda-info"><b>{a.objet}</b><span>{a.dossier}</span><small><Clock3 size={13}/> {a.heure} · {a.tribunal}</small></div></div>)}{data.audiences.length===0&&<p className="empty">Aucune audience.</p>}</div></section></div><div className="quick-actions"><h2>Accès rapides</h2><div className="quick-grid">{[['dossiers','Créer un dossier',FolderOpen],['clients','Ajouter un client',Users],['audiences','Planifier une audience',CalendarDays],['factures','Émettre une facture',Receipt]].map(([p,label,Icon])=><button key={p} onClick={()=>start(p)}><Icon size={19}/><span>{label}</span><ArrowUpRight size={16}/></button>)}</div></div></>:page==='settings'?<div className="panel settings-panel"><h2>Configuration du cabinet</h2><p>Cette version est un prototype local sans serveur ni authentification.</p><div className="setting-line"><b>Nom du cabinet</b><span>Cabinet Juridique</span></div><div className="setting-line"><b>Devise</b><span>Dirham marocain (MAD)</span></div><div className="setting-line"><b>Stockage</b><span>Navigateur local (démonstration uniquement)</span></div><div className="setting-line"><b>Utilisateurs et rôles</b><span>À intégrer avec le backend sécurisé</span></div><button className="danger" onClick={()=>{if(confirm('Réinitialiser toutes les données de démonstration ?')){setData(initial);notify('Démo réinitialisée')}}}>Réinitialiser les données démo</button></div>:<section className="panel list-panel"><div className="list-tools"><div className="search"><Search size={18}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={`Rechercher ${page==='dossiers'?'un dossier':page==='clients'?'un client':'...'}`}/></div>{['dossiers','audiences'].includes(page)&&<div className="select-wrap"><Filter size={16}/><select value={filter} onChange={e=>setFilter(e.target.value)}>{['Tous',...(page==='dossiers'?['En cours','Audience prévue','En attente','Clôturé']:['Programmée','Reportée','Tenue','Annulée'])].map(v=><option key={v}>{v}</option>)}</select></div>}<button className="outline" onClick={()=>exportCSV(page)}><Download size={16}/> Export CSV</button></div><div className="table-wrap"><table><thead><tr>{columns[page].map(([k,title])=><th key={k}>{title.toUpperCase()}</th>)}<th>ACTIONS</th></tr></thead><tbody>{shown.map(row=><tr key={row.id}>{columns[page].map(([k])=><td key={k}>{k==='statut'?<span className={`status ${badge(row[k])}`}>{row[k]}</span>:k==='date'||k==='prochaine'?fmtDate(row[k]):['montant','paye','reste'].includes(k)?fmtMoney(k==='reste'?Number(row.montant||0)-Number(row.paye||0):row[k]):k==='objet'||k==='nom'?<b>{row[k]}</b>:row[k]||'—'}</td>)}<td><div className="row-actions"><button title="Modifier" onClick={()=>start(page,row)}><Pencil size={16}/></button><button title="Supprimer" onClick={()=>remove(page,row.id)}><Trash2 size={16}/></button></div></td></tr>)}{!shown.length&&<tr><td colSpan={columns[page].length+1} className="empty">Aucun résultat trouvé.</td></tr>}</tbody></table></div><div className="table-footer">{shown.length} résultat{shown.length>1?'s':''} affiché{shown.length>1?'s':''}</div></section>}</div>}</main>
- {modal&&<div className="modal-backdrop" onMouseDown={e=>e.target===e.currentTarget&&setModal(null)}><div className={`modal ${caseModal ? "case-form" : ""}`} role="dialog" aria-modal="true" aria-labelledby="record-form-title"><div className="modal-head"><div><h2 id="record-form-title">{caseModal ? (editing ? "تعديل الملف" : "ملف جديد") : `${editing ? "Modifier" : "Créer"} — ${titles[modal]}`}</h2></div><button className="icon-button" onClick={()=>setModal(null)}><X size={20}/></button></div><form onSubmit={save}><div className="form-grid">{fields[modal].map(([key,label,type,opts])=><label key={key} className={['objet','nom','tribunal','description'].includes(key)?'wide':''}><span>{caseModal ? arabicFields[key] : label}</span>{type==='select'||type==='client'||type==='dossier'?<select value={form[key]??''} onChange={e=>setForm({...form,[key]:e.target.value})}><option value="">{caseModal ? "اختر…" : "Sélectionner…"}</option>{(type==='client'?data.clients.map(c=>c.nom):type==='dossier'?data.dossiers.map(d=>d.id):opts).map(v=><option key={v} value={v}>{caseModal && type==="select" ? caseLabels[v] || v : v}</option>)}</select>:type==="textarea"?<textarea dir="auto" value={form[key]??""} onChange={e=>setForm({...form,[key]:e.target.value})}/>:<input dir="auto" type={type||'text'} value={form[key]??''} onChange={e=>setForm({...form,[key]:e.target.value})} placeholder={caseModal ? arabicFields[key] : label} step={type==='number'?'0.01':undefined}/>}</label>)}</div>{modal==='documents'&&<p className="form-note"><AlertTriangle size={15}/> Cette version référence les documents par leur nom. Le téléversement sécurisé sera ajouté avec le backend.</p>}<div className="modal-actions">{caseModal && editing && <button type="button" className="danger" onClick={()=>remove("dossiers", editing)}>حذف الملف</button>}<button type="button" className="outline" onClick={()=>setModal(null)}>{caseModal ? "إلغاء" : "Annuler"}</button><button type="submit" className="primary"><Save size={17}/> {caseModal ? "حفظ" : "Enregistrer"}</button></div></form></div></div>}
- {toast&&<div className="toast" role="status"><CheckCircle2 size={18}/>{toast}</div>}
- </div>;
+const titles = { dashboard: 'لوحة التحليلات', dossiers: 'الملفات القضائية', clients: 'الموكلون', audiences: 'الجلسات', documents: 'الوثائق', factures: 'الأتعاب والفواتير', settings: 'الإعدادات' };
+const fieldLabels = {
+  id: 'المرجع', objet: 'الموضوع', description: 'وصف الملف', client: 'الموكل', type: 'النوع',
+  tribunal: 'المحكمة', responsable: 'المحامي المسؤول', reference: 'مرجع المحكمة', statut: 'الحالة',
+  ouverture: 'تاريخ فتح الملف', prochaine: 'الجلسة المقبلة', nom: 'الاسم', telephone: 'الهاتف',
+  email: 'البريد الإلكتروني', ville: 'المدينة', dossier: 'الملف', date: 'التاريخ', heure: 'الساعة',
+  categorie: 'الفئة', montant: 'المبلغ (د.م.)', paye: 'المبلغ المسدد (د.م.)', reste: 'المبلغ المتبقي', echeance: 'تاريخ الاستحقاق',
+};
+const optionLabels = {
+  ...caseLabels, 'Personne physique': 'شخص ذاتي', 'Personne morale': 'شخص اعتباري',
+  'Programmée': 'مبرمجة', 'Reportée': 'مؤجلة', Tenue: 'منعقدة', 'Annulée': 'ملغاة',
+  'Acte juridique': 'محرر قانوني', 'Pièce justificative': 'وثيقة إثبات', Conclusions: 'مذكرة', Correspondance: 'مراسلة',
+};
+const translate = value => optionLabels[value] || value;
+const dateToday = () => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Africa/Casablanca' }).format(new Date());
+const remaining = row => Number(row.montant || 0) - Number(row.paye || 0);
+const dateKeys = ['date', 'prochaine', 'echeance', 'ouverture'];
+const storage = 'avocium-demo-v1';
+const optional = new Set(['description', 'ouverture', 'prochaine', 'reference', 'responsable', 'telephone', 'email', 'ville', 'heure', 'tribunal', 'categorie', 'paye', 'echeance']);
+const addLabels = { clients: 'موكل جديد', audiences: 'جلسة جديدة', documents: 'وثيقة جديدة', factures: 'فاتورة جديدة' };
+const starts = { dossiers: 'DOS', clients: 'CLI', audiences: 'AUD', documents: 'DOC', factures: 'FAC' };
+
+function load() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(storage) ?? localStorage.getItem('lexcabinet-demo-v1'));
+    if (saved && Object.keys(initial).every(key => Array.isArray(saved[key]))) return saved;
+  } catch {}
+  return initial;
 }
-function Stat({icon:Icon,label,value,detail,tone}){return <div className="stat"><div className="stat-top"><span>{label}</span><div className={`stat-icon ${tone}`}><Icon size={20}/></div></div><strong>{value}</strong><small>{detail}</small><div className={`stat-bar ${tone}`}/></div>}
+
+function display(row, key) {
+  const value = row[key];
+  if (key === 'reste') return money(remaining(row));
+  if (key === 'montant' || key === 'paye') return money(value);
+  if (dateKeys.includes(key)) return value ? value.split('-').reverse().join('/') : '—';
+  return (['statut', 'type', 'categorie'].includes(key) ? translate(value) : value) || '—';
+}
+
+export default function App() {
+  const [data, setData] = useState(load);
+  const [page, setPage] = useState(() => {
+    const path = window.location.pathname.slice(1);
+    return Object.hasOwn(titles, path) ? path : 'dashboard';
+  });
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState('');
+  const [mobile, setMobile] = useState(false);
+  const [modal, setModal] = useState(null);
+  const [form, setForm] = useState({});
+  const [toast, setToast] = useState('');
+
+  useEffect(() => {
+    try { localStorage.setItem(storage, JSON.stringify(data)); }
+    catch { setToast('تعذر حفظ البيانات في المتصفح.'); }
+  }, [data]);
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(''), 3800);
+    return () => clearTimeout(timer);
+  }, [toast]);
+  useEffect(() => {
+    if (!modal) return;
+    const close = event => { if (event.key === 'Escape') setModal(null); };
+    window.addEventListener('keydown', close);
+    return () => window.removeEventListener('keydown', close);
+  }, [modal]);
+
+  function navigate(next, selectedFilter = '') {
+    setPage(next);
+    setQuery('');
+    setFilter(selectedFilter);
+    setMobile(false);
+  }
+
+  function start(section, row) {
+    const today = dateToday();
+    setModal(section);
+    setForm(row ? { ...row } : { date: today, dateCreation: today, ouverture: today, paye: 0,
+      statut: section === 'dossiers' ? 'En cours' : section === 'audiences' ? 'Programmée' : undefined });
+  }
+
+  function save(event) {
+    event.preventDefault();
+    if (fields[modal].some(([key]) => !optional.has(key) && !String(form[key] ?? '').trim())) {
+      setToast('يرجى ملء الحقول المطلوبة.');
+      return;
+    }
+    if (modal === 'factures' && (Number(form.montant) <= 0 || Number(form.paye) > Number(form.montant))) {
+      setToast('تحقق من مبلغ الفاتورة والمبلغ المسدد.');
+      return;
+    }
+    const record = { ...form, id: form.id || `${starts[modal]}-${Date.now()}` };
+    setData(previous => ({ ...previous, [modal]: form.id ? previous[modal].map(row => row.id === form.id ? record : row) : [record, ...previous[modal]] }));
+    setModal(null);
+    setToast('تم الحفظ.');
+  }
+
+  function remove(section, row) {
+    if (section === 'dossiers' && ['audiences', 'documents', 'factures'].some(key => data[key].some(item => item.dossier === row.id))) {
+      setToast('هذا الملف مرتبط بسجلات أخرى. يمكنك أرشفته.');
+      return;
+    }
+    if (!window.confirm('هل تريد حذف هذا السجل نهائياً؟')) return;
+    setData(previous => ({ ...previous, [section]: previous[section].filter(item => item.id !== row.id) }));
+    setModal(null);
+    setToast('تم الحذف.');
+  }
+
+  function exportRows(section, rows = data[section]) {
+    const keys = columns[section].map(([key]) => key);
+    downloadCsv('avocium-' + section, [keys.map(key => fieldLabels[key]),
+      ...rows.map(row => keys.map(key => key === 'reste' ? remaining(row) : key === 'paye' || key === 'montant' ? Number(row[key] || 0) : display(row, key)))]);
+  }
+
+  const term = query.trim().toLowerCase();
+  const shown = columns[page] ? data[page].filter(row => {
+    const matches = Object.entries(row).some(([key, value]) => String(value ?? '').toLowerCase().includes(term)
+      || String(display(row, key)).toLowerCase().includes(term));
+    const selected = !filter || (filter === 'overdue' ? row.echeance && row.echeance < dateToday() && remaining(row) > 0 : row.statut === filter);
+    return matches && selected;
+  }) : [];
+
+  return <div className="shell arabic-shell">
+    <aside className={`sidebar ${mobile ? 'open' : ''}`} dir="rtl" aria-label="القائمة الرئيسية">
+      <div className="brand"><div className="brand-icon"><Scale size={26}/></div>
+        <div><strong>AVOCIUM</strong><small>إدارة المكتب القانوني</small></div>
+        <button className="mobile-close" aria-label="إغلاق القائمة" onClick={() => setMobile(false)}><X size={18}/></button>
+      </div>
+      <nav>{nav.map(([id, , Icon]) => <button key={id} className={`nav-item ${page === id ? 'active' : ''}`} aria-current={page === id ? 'page' : undefined} onClick={() => navigate(id)}>
+        <Icon size={19}/><span>{id === 'dashboard' ? 'لوحة التحكم' : titles[id]}</span>
+      </button>)}</nav>
+      <div className="side-bottom"><div className="profile"><div className="avatar">م</div><div><b>إدارة المكتب</b><small>وضع تجريبي</small></div></div></div>
+    </aside>
+    <main className="main" dir="rtl">
+      <header className="topbar">
+        <div className="breadcrumb"><button className="hamburger" aria-label="فتح القائمة" onClick={() => setMobile(true)}><Menu size={22}/></button><strong>{titles[page]}</strong></div>
+        <span className="demo-label">وضع تجريبي</span>
+      </header>
+      {page === 'dashboard' ? <Analytics data={data} navigate={navigate}/>
+        : page === 'dossiers' ? <Dossiers data={data} selectedIds={Array.isArray(filter) ? filter : null} onCreate={() => start('dossiers')} onOpen={row => start('dossiers', row)} onExport={() => exportRows('dossiers')}/>
+        : <div className="content"><div className="page-heading"><h1>{titles[page]}</h1>
+          {columns[page] && <button className="primary" onClick={() => start(page)}><Plus size={18}/>{addLabels[page]}</button>}
+        </div>
+        {page === 'settings' ? <section className="panel settings-panel">
+          <h2>إعدادات المكتب</h2>
+          <div className="setting-line"><b>العملة</b><span>الدرهم المغربي</span></div>
+          <div className="setting-line"><b>التخزين</b><span>محلي في المتصفح</span></div>
+          <button className="danger" onClick={() => {
+            if (window.confirm('هل تريد استعادة بيانات العرض التجريبي؟ ستُحذف تعديلاتك المحلية.')) {
+              setData(initial);
+              setToast('تمت استعادة بيانات العرض.');
+            }
+          }}>استعادة بيانات العرض</button>
+        </section> : <section className="panel list-panel">
+          <div className="list-tools">
+            <label className="search"><Search size={18}/><input type="search" aria-label="بحث" value={query} onChange={event => setQuery(event.target.value)} placeholder="بحث…"/></label>
+            {page === 'audiences' && <select aria-label="حالة الجلسة" value={filter} onChange={event => setFilter(event.target.value)}>
+              <option value="">كل الحالات</option>{['Programmée', 'Reportée', 'Tenue', 'Annulée'].map(value => <option key={value} value={value}>{translate(value)}</option>)}
+            </select>}
+            {page === 'factures' && <select aria-label="حالة الفاتورة" value={filter} onChange={event => setFilter(event.target.value)}>
+              <option value="">كل الفواتير</option><option value="overdue">متأخرة</option>
+            </select>}
+            <button className="outline" onClick={() => exportRows(page, shown)}><Download size={16}/> تصدير CSV</button>
+          </div>
+          <div className="table-wrap"><table><thead><tr>{columns[page].map(([key]) => <th key={key}>{fieldLabels[key]}</th>)}<th>الإجراءات</th></tr></thead>
+            <tbody>{shown.map(row => <tr key={row.id}>{columns[page].map(([key]) => <td key={key}><bdi>{display(row, key)}</bdi></td>)}
+              <td><div className="row-actions"><button aria-label="تعديل" onClick={() => start(page, row)}><Pencil size={16}/></button><button aria-label="حذف" onClick={() => remove(page, row)}><Trash2 size={16}/></button></div></td>
+            </tr>)}{!shown.length && <tr><td className="empty" colSpan={columns[page].length + 1}>لا توجد نتائج مطابقة.</td></tr>}</tbody>
+          </table></div>
+          <div className="table-footer">{shown.length} نتائج</div>
+        </section>}</div>}
+    </main>
+    {modal && <div className="modal-backdrop" dir="rtl" onMouseDown={event => { if (event.target === event.currentTarget) setModal(null); }}>
+      <div className="modal case-form" role="dialog" aria-modal="true" aria-labelledby="form-title">
+        <div className="modal-head"><h2 id="form-title">{form.id ? 'تعديل السجل' : modal === 'dossiers' ? 'ملف جديد' : addLabels[modal]}</h2>
+          <button type="button" className="icon-button" aria-label="إغلاق" onClick={() => setModal(null)}><X size={20}/></button></div>
+        <form onSubmit={save}><div className="form-grid">{fields[modal].map(([key, , type, options]) => {
+          const selection = type === 'client' ? data.clients.map(row => row.nom) : type === 'dossier' ? data.dossiers.map(row => row.id) : options;
+          const value = form[key] ?? '';
+          const update = event => setForm(previous => ({ ...previous, [key]: event.target.value }));
+          return <label key={key} className={['objet', 'description', 'tribunal'].includes(key) ? 'wide' : ''}>
+            <span>{modal === 'documents' && key === 'nom' ? 'اسم الوثيقة' : fieldLabels[key]}</span>
+            {selection ? <select value={value} onChange={update} required={!optional.has(key)}>
+              <option value="">اختر…</option>
+              {value && !selection.includes(value) && <option value={value}>{value}</option>}
+              {selection.map(option => <option key={option} value={option}>{type === 'select' ? translate(option) : option}</option>)}
+            </select> : type === 'textarea' ? <textarea dir="auto" value={value} onChange={update}/>
+              : <input dir="auto" type={type || 'text'} value={value} onChange={update} required={!optional.has(key)} min={type === 'number' ? 0 : undefined} step={type === 'number' ? '0.01' : undefined}/>}
+          </label>;
+        })}</div>
+        {modal === 'documents' && <p className="form-note">يحفظ هذا النموذج معلومات الوثيقة فقط.</p>}
+        <div className="modal-actions">
+          {modal === 'dossiers' && form.id && <button type="button" className="danger" onClick={() => remove(modal, form)}>حذف الملف</button>}
+          <button type="button" className="outline" onClick={() => setModal(null)}>إلغاء</button>
+          <button type="submit" className="primary"><Save size={17}/> حفظ</button>
+        </div></form>
+      </div>
+    </div>}
+    {toast && <div className="toast" dir="rtl" role="status">{toast}</div>}
+  </div>;
+}

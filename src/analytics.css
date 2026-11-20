@@ -1,0 +1,53 @@
+.analytics { --line: #dce4ee; max-width: 1520px; margin: auto; padding: clamp(16px, 3vw, 42px); color: #172a43; }
+.analytics-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.analytics h1 { font-size: clamp(25px, 3vw, 34px); margin: 0 0 4px; }
+.analytics p { color: #52637b; margin: 0 0 12px; }
+.analytics-controls, .analytics-controls > div, .analytics-legend { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.analytics-controls button { display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; background: white; color: #172a43; border: 1px solid var(--line); border-radius: 8px; font: inherit; cursor: pointer; }
+.analytics-controls button[aria-pressed=true] { background: #166d66; color: white; border-color: #166d66; }
+.analytics .analytics-range { margin: 4px 0 16px; font-size: 13px; }
+.analytics-metrics, .analytics-alerts, .analytics-charts, .analytics-breakdowns { display: grid; gap: 12px; margin-bottom: 14px; }
+.analytics-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.analytics-metrics article, .analytics-panel { border: 1px solid var(--line); border-radius: 13px; background: white; padding: 16px; min-width: 0; }
+.analytics-metrics article { display: flex; gap: 9px; align-items: center; }
+.analytics-metrics svg { color: #14756d; flex-shrink: 0; }
+.analytics-metrics strong, .analytics-metrics small { display: block; }
+.analytics-metrics strong { font-size: clamp(16px, 2vw, 24px); }
+.analytics-metrics small, .analytics-alert small { color: #53637a; display: block; }
+.analytics-alerts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.analytics-alert { display: flex; align-items: center; gap: 10px; text-align: start; padding: 13px; border: 1px solid; border-radius: 11px; font: inherit; cursor: pointer; }
+.analytics-alert.red { background: #fff3f3; color: #9d293b; border-color: #e5aab3; }
+.analytics-alert.amber { background: #fff8ea; color: #805206; border-color: #e8c985; }
+.analytics-charts { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+.analytics-breakdowns { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.analytics-panel h2 { margin: 0 0 5px; font-size: 17px; }
+.analytics-panel p { font-size: 13px; }
+.month-scroll { overflow-x: auto; }
+.month-chart { display: flex; padding: 6px 4px; gap: 9px; background: #f7f9fd; }
+.month-group { flex: 1 0 48px; text-align: center; font-size: 11px; }
+.month-bars { height: 150px; display: flex; gap: 3px; justify-content: center; border-bottom: 1px solid #c3cede; }
+.month-track { height: 100%; width: 15%; max-width: 18px; display: flex; align-items: end; }
+.month-track span { width: 100%; border-radius: 4px 4px 0 0; }
+.analytics-legend { margin: 10px 0; font-size: 12px; }
+.analytics-legend span { display: flex; align-items: center; gap: 4px; }
+.analytics-legend i { width: 10px; height: 10px; border-radius: 2px; }
+[data-series=cases] { background: #a35b11; }
+[data-series=hearings] { background: #7952bd; }
+[data-series=billed] { background: #177eac; }
+[data-series=paid] { background: #167a65; }
+.analytics-client { margin-block: 12px; }
+.analytics-client > div, .breakdown-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.analytics-client meter, .breakdown-row meter { flex: 1; min-width: 35px; }
+.analytics meter::-webkit-meter-optimum-value { background: #168078; }
+.analytics meter.remaining::-webkit-meter-optimum-value { background: #b35e75; }
+.breakdown-row { margin-top: 8px; }
+.analytics summary { cursor: pointer; font-size: 13px; }
+@media(max-width:1050px) { .analytics-metrics, .analytics-breakdowns { grid-template-columns: repeat(2, minmax(0, 1fr)); } .analytics-charts { grid-template-columns: 1fr; } }
+@media(max-width:520px) { .analytics-alerts, .analytics-breakdowns { grid-template-columns: 1fr; } }
+@media print {
+  .sidebar, .topbar, .analytics-controls { display: none !important; }
+  .shell .main { grid-column: auto; width: 100%; }
+  .analytics { padding: 0; }
+  .analytics-panel, .analytics-metrics article { break-inside: avoid; }
+  .analytics { print-color-adjust: exact; }
+}
