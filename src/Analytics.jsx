@@ -3,6 +3,7 @@ import { AlertTriangle, CalendarDays, Download, FileText, FolderOpen, Gavel, Pri
 import { labels } from './Dossiers.jsx';
 import { downloadCsv, money } from './locale.js';
 import './analytics.css';
+import { billable, isOverdue } from './office.js';
 
 const periods = [[30, '30 يوماً'], [90, '90 يوماً'], [180, '6 أشهر'], [365, '12 شهراً'], [0, 'الكل']];
 const today = () => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Africa/Casablanca' }).format(new Date());
@@ -49,10 +50,10 @@ export default function Analytics({ data, navigate }) {
   const hearings = data.audiences.filter(row => inRange(row.date));
   const clients = data.clients.filter(row => inRange(row.dateCreation));
   const docs = data.documents.filter(row => inRange(row.date));
-  const invoices = data.factures.filter(row => inRange(row.date));
+  const invoices = data.factures.filter(row => billable(row) && inRange(row.date));
   const billed = sum(invoices, 'montant');
   const paid = sum(invoices, 'paye');
-  const overdue = data.factures.filter(row => row.echeance && row.echeance < end && balance(row));
+  const overdue = data.factures.filter(row => isOverdue(row, end));
   const upcoming = new Set(data.audiences.filter(row => row.date >= end && row.statut === 'Programmée').map(row => row.dossier));
   const withoutHearing = data.dossiers.filter(row => !['Archivé', 'Clôturé'].includes(row.statut) && !upcoming.has(row.id) && !(row.prochaine && row.prochaine >= end));
   const metrics = [
@@ -61,8 +62,8 @@ export default function Analytics({ data, navigate }) {
     [CalendarDays, 'جلسات الفترة', hearings.length, data.audiences.length],
     [FileText, 'وثائق الفترة', docs.length, data.documents.length],
     [Receipt, 'فواتير الفترة', invoices.length, data.factures.length],
-    [Wallet, 'محصل على فواتير الفترة', money(paid), money(sum(data.factures, 'paye'))],
-    [Receipt, 'مفوتر في الفترة', money(billed), money(sum(data.factures, 'montant'))],
+    [Wallet, 'محصل على فواتير الفترة', money(paid), money(sum(data.factures.filter(billable), 'paye'))],
+    [Receipt, 'مفوتر في الفترة', money(billed), money(sum(data.factures.filter(billable), 'montant'))],
   ];
   const dates = [...cases.map(row => row.ouverture), ...hearings.map(row => row.date), ...invoices.map(row => row.date)].filter(Boolean).sort();
   const months = monthKeys(start || dates[0] || end, days ? end : dates.at(-1) || end);

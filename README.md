@@ -12,7 +12,10 @@ Prototype de logiciel de gestion juridique pour un cabinet au Maroc.
 - Création, modification et suppression des dossiers judiciaires
 - Fichier clients (personnes physiques et morales)
 - Suivi et calendrier sous forme de liste des audiences
-- Référencement de documents (métadonnées uniquement)
+- Documents et mémoires avec pièces jointes locales, recherche, téléchargement et impression des fiches.
+- Répertoire des tribunaux et suivi des tâches avec calendrier et Kanban.
+- Audiences en liste, semaine, mois ou Kanban.
+- Facturation par client ou facture, lignes détaillées, TVA paramétrable et suivi des retards.
 - Factures, règlements partiels et calcul du solde
 - Recherche, filtres, exports CSV, interface responsive
 - Données de démonstration fictives, sauvegardées dans le `localStorage` du navigateur
@@ -37,7 +40,7 @@ npm run preview
 
 ## IMPORTANT : limites de cette version
 
-Cette version est destinée aux essais avec des données fictives. Les données sont enregistrées uniquement dans le navigateur (non chiffrées, non synchronisées, sans sauvegardes serveur). Les documents ne sont **pas** téléversés : seul leur nom est conservé. Les utilisateurs, autorisations, authentification et notifications restent à implémenter.
+Cette version est destinée aux essais avec des données fictives. Les données sont enregistrées uniquement dans le navigateur (non chiffrées, non synchronisées, sans sauvegardes serveur). Les pièces jointes sont conservées dans IndexedDB sur le navigateur utilisé. Le marquage de confidentialité sert au classement et ne contrôle pas les accès. Les utilisateurs, autorisations, authentification et notifications restent à implémenter.
 
 Ne pas importer de dossiers réels, données personnelles sensibles ou pièces confidentielles.
 

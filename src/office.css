@@ -1,0 +1,27 @@
+.office-metrics, .office-board, .office-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-block: 12px; }
+.office-metrics article, .office-board section, .office-cards article { padding:14px; background:#fff; border:1px solid #dce4ee; border-radius:12px; min-width:0; overflow-wrap:anywhere; }
+.office-metrics strong { display:block; color:#17675f; margin-top:6px; font-size:1.25rem; }
+.office-tools { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.office-tools button[aria-pressed=true] { background:#243c58; color:#fff; }
+.office-actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.office-actions button { padding:6px 10px; }
+.office-calendar { margin:12px; border:1px solid #dce4ee; border-radius:12px; overflow:hidden; }
+.office-calendar-head { display:flex; justify-content:space-between; align-items:center; padding:10px; }
+.office-calendar-scroll { overflow:auto; }
+.office-calendar-grid { display:grid; grid-template-columns:repeat(7,minmax(82px,1fr)); }
+.office-calendar-grid > * { padding:7px; border:1px solid #edf1f5; }
+.office-calendar-grid > div { min-height:72px; }
+.office-calendar-grid > b, .office-calendar-grid [data-today=true] { background:#e8f6f4; }
+.office-calendar-grid button { display:block; width:100%; overflow-wrap:anywhere; margin-top:4px; border:0; border-radius:5px; background:#e7eef8; color:#203651; cursor:pointer; }
+.office-board, .office-cards { padding-inline:12px; }
+.office-board button { display:flex; width:100%; margin-block:6px; }
+.office-lines { margin:16px 0; border:1px solid #dce4ee; border-radius:10px; padding:12px; min-width:0; }
+.office-line { display:grid; grid-template-columns:2fr 1fr .7fr 1fr auto auto; gap:6px; align-items:end; margin-bottom:10px; }
+.office-line label { min-width:0; font-size:12px; }
+.office-line input, .office-line select { width:100%; min-width:0; border:1px solid #dce4ee; border-radius:7px; padding:7px; font:inherit; }
+.office-lines dl { display:grid; grid-template-columns:1fr auto; gap:8px; }
+.office-lines dd { margin:0; }
+.arabic-shell .modal { max-height:calc(100dvh - 32px); overflow:auto; }
+.office-preview p { white-space:pre-wrap; overflow-wrap:anywhere; }
+@media(max-width:600px) { .office-line { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media print { body:has(.office-preview) .main { display:none; } body:has(.office-preview) .modal-backdrop { position:static; display:block; background:none; } .office-preview .office-actions, .office-preview .icon-button { display:none; } }
